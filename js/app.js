@@ -29,6 +29,14 @@ var model = {
         localStorage.attendance = JSON.stringify(attendance);
     }
 	},
+    
+    getCurrentAttendance : function() {
+        return JSON.parse(localStorage.attendance);
+    },
+    
+    incrementMissing : function(nameOfStudent) {
+        attendance[]
+    }
 	
 	
 }
@@ -37,36 +45,15 @@ var model = {
 var octopus = {
 	init : function() {
 		model.init();
+        view.init();
 	},
 	
 	getCurrentAttendance : function() {
-		var attendance = JSON.parse(localStorage.attendance),
-	}
-}
-
-/*************** VIEW ***************/
-var view = {
-	init : function() {
-		var attendance = JSON.parse(localStorage.attendance),
-        $allMissed = $('tbody .missed-col'),
-        $allCheckboxes = $('tbody input');
-
+		return model.getCurrentAttendance();
 	},
-	
-	render : function() {
-		
-	}
-}
-
-
-$(function() {
-    var attendance = JSON.parse(localStorage.attendance),
-        $allMissed = $('tbody .missed-col'),
-        $allCheckboxes = $('tbody input');
-
-    // Count a student's missed days
-    function countMissing() {
-        $allMissed.each(function() {
+    
+    countMissing : function() {
+        view.$allMissed.each(function() {
             var studentRow = $(this).parent('tr'),
                 dayChecks = $(studentRow).children('td').children('input'),
                 numMissed = 0;
@@ -79,9 +66,36 @@ $(function() {
 
             $(this).text(numMissed);
         });
+    },
+    
+    checkBoxes : function() {
+        console.log('checkBoxes');
+        view.render();
+    },
+    
+    incrementMissing : function(nameOfStudent) {
+        console.log("incrementMissing");
+        model.incrementMissing(nameOfStudent);
+        view.render();
     }
+ }
 
-    // Check boxes, based on attendace records
+/*************** VIEW ***************/
+var view = {
+	init : function() {
+        var attendance = octopus.getCurrentAttendance();
+        $allMissed = $('tbody .missed-col'),
+        $allCheckboxes = $('tbody input');
+        
+        var studentName = $('.name-col').text();
+        
+        // add a click handler to each checkbox , so that it calls the incrementMissing()
+        // implementation
+	},
+	
+	render : function() {
+        
+    // full check boxes, based on attendace records
     $.each(attendance, function(name, days) {
         var studentRow = $('tbody .name-col:contains("' + name + '")').parent('tr'),
             dayChecks = $(studentRow).children('.attend-col').children('input');
@@ -90,7 +104,18 @@ $(function() {
             $(this).prop('checked', days[i]);
         });
     });
+	},
+    
+    // render according to the row / student selected
+    partialRender : function() {
+        
+    }
+}
 
+/*   LEFT TO REFACTOR
+$(function() {
+    
+    
     // When a checkbox is clicked, update localStorage
     $allCheckboxes.on('click', function() {
         var studentRows = $('tbody .student'),
@@ -113,3 +138,7 @@ $(function() {
 
     countMissing();
 }());
+*/
+
+
+octopus.init();
