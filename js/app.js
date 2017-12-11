@@ -35,9 +35,12 @@ var model = {
     },
     
     incrementMissing : function(nameOfStudent) {
-        attendance[]
+        attendance[nameOfStudent]++;
+    },
+    
+    updateLocalStorage : function(attendance) {
+      localStorage.attendance = JSON.stringify(attendance);
     }
-	
 	
 }
 
@@ -45,7 +48,7 @@ var model = {
 var octopus = {
 	init : function() {
 		model.init();
-        view.init();
+    view.init();
 	},
 	
 	getCurrentAttendance : function() {
@@ -77,11 +80,18 @@ var octopus = {
         console.log("incrementMissing");
         model.incrementMissing(nameOfStudent);
         view.render();
+    },
+  
+    updateLocalStorage : function(attendance) {
+      console.log("updating the local storage attendance");
+      model.updateLocalStorage(attendance);
     }
  }
 
 /*************** VIEW ***************/
 var view = {
+  $allMissed : $('tbody .missed-col'),
+  
 	init : function() {
         var attendance = octopus.getCurrentAttendance();
         $allMissed = $('tbody .missed-col'),
@@ -90,7 +100,25 @@ var view = {
         var studentName = $('.name-col').text();
         
         // add a click handler to each checkbox , so that it calls the incrementMissing()
-        // implementation
+        // When a checkbox is clicked, update localStorage
+    $allCheckboxes.on('click', function() {
+        var studentRows = $('tbody .student'),
+            newAttendance = {};
+
+        studentRows.each(function() {
+            var name = $(this).children('.name-col').text(),
+                $allCheckboxes = $(this).children('td').children('input');
+
+            newAttendance[name] = [];
+
+            $allCheckboxes.each(function() {
+                newAttendance[name].push($(this).prop('checked'));
+            });
+        });
+
+        octopus.countMissing();
+        octopus.updateLocalStorage(newAttendance);
+      });
 	},
 	
 	render : function() {
@@ -111,34 +139,5 @@ var view = {
         
     }
 }
-
-/*   LEFT TO REFACTOR
-$(function() {
-    
-    
-    // When a checkbox is clicked, update localStorage
-    $allCheckboxes.on('click', function() {
-        var studentRows = $('tbody .student'),
-            newAttendance = {};
-
-        studentRows.each(function() {
-            var name = $(this).children('.name-col').text(),
-                $allCheckboxes = $(this).children('td').children('input');
-
-            newAttendance[name] = [];
-
-            $allCheckboxes.each(function() {
-                newAttendance[name].push($(this).prop('checked'));
-            });
-        });
-
-        countMissing();
-        localStorage.attendance = JSON.stringify(newAttendance);
-    });
-
-    countMissing();
-}());
-*/
-
 
 octopus.init();
